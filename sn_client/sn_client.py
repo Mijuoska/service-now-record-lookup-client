@@ -61,7 +61,11 @@ class SNClient:
                    "Accept": "application/json"}
         response = requests.get(url, auth=(self.username, self.password), headers=headers)
         result = self._handle_response(response)
-        return result
+        if len(result) > 0:
+            return result
+        else:
+            return None
+            
 
     def send_attachment_api_request(self, query):
         if query:
@@ -88,24 +92,7 @@ class SNClient:
         attachment = {'content': response.content,
                     'filename': metadata['file_name']}
         return attachment
-                
-
-    def download_attachment_from_ticket(self, number):
-        result = self.send_table_api_request('task', f'number={number}')
-        ticket_sys_id = result[0]['sys_id']
-        print(f'Found ticket with the number {number} from {self.get_instance_url()}')
-        attachment_list = self.send_attachment_api_request(f'table_sys_id={ticket_sys_id}')
-        attachments = []
-        if len(attachment_list) >= 0:
-            print(f'found {len(attachment_list)} attachments')
-            for a in attachment_list:
-                print('downloading...')
-                f = self.download_attachment(a['sys_id'])
-                attachments.append(f)
-            return attachments
-        else:
-            print('Something went wrong with downloading the attachments')
-
+                        
 
     def _handle_response(self, response):
         if response.status_code != 200:
