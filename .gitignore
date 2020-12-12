@@ -1,3 +1,6 @@
 __pycache__
+sn_client/__pycache__
 Data
-instances.db
+*.db
+venv
+.vscode
