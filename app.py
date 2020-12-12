@@ -1,4 +1,4 @@
-from sn_client.sn_client import SNClient
+from sn_client.api import SNClient
 from utils import create_folder, save_file
 
 
