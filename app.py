@@ -1,8 +1,51 @@
 from sn_client.api import SNClient
+from sn_client.credential_manager import CredentialManager
 from utils import create_folder, save_file
+from settings import DATABASE_NAME
 
 
-sn_client = SNClient('dev96541', 'admin', 'Nv$461vGAWFhNf')
+cred_manager = CredentialManager(DATABASE_NAME)
+saved_instances = cred_manager.fetch_all_instances()
+choices = {}
+for n, instance in enumerate(saved_instances, start=1):
+    choices[n] = instance[0]
+
+choice = input(f'choose an instance: {choices} or type a new instance name: ')
+existing_choice = ""
+new_choice = ""
+
+try:
+    choice = int(choice)
+except ValueError:
+    new_choice = choice
+else:
+    if choice >= 1 and choice <= len(saved_instances) + 1:
+        existing_choice = choice
+    else:
+        print('Invalid choice')
+        exit()
+
+
+
+if existing_choice:
+    selected_instance = choices[existing_choice]
+    credentials = cred_manager.fetch_credentials_for_instance(selected_instance)
+    username = credentials[0]
+    password = credentials[1]
+    sn_client = SNClient(selected_instance, username, password)
+else:
+    selected_instance = new_choice
+    username = input('Please enter instance username: ')
+    password = input('Please enter instance password: ')
+    save_credentials = input('Save these credentials? Y to confirm, any other key to disconfirm: ')
+    if save_credentials.lower() == 'y':
+        cred_manager.save_instance_credentials((selected_instance, username, password,))
+    else:
+        pass
+    sn_client = SNClient(selected_instance, username, password)
+    sn_client.test_connection()
+
+
 
 while True:
     record_ID = input('Please enter a record ID: ')
