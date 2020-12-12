@@ -1,10 +1,9 @@
 from sn_client.api import SNClient
 from sn_client.credential_manager import CredentialManager
 from utils import create_folder, save_file
-from settings import DATABASE_NAME
 
 
-cred_manager = CredentialManager(DATABASE_NAME)
+cred_manager = CredentialManager()
 saved_instances = cred_manager.fetch_all_instances()
 choices = {}
 for n, instance in enumerate(saved_instances, start=1):

@@ -1,15 +1,15 @@
 import requests
 import json
 import re
-from .settings import RECORD_ID_FORMAT, DISPLAYED_DATA_FIELDS
+from . import settings 
 
 class SNClient:
     def __init__(self, instance, username, password):
         self.instance = instance
         self.username = username
         self.password = password
-        self.record_id_format = RECORD_ID_FORMAT
-        self.fields = DISPLAYED_DATA_FIELDS
+        self.record_id_format = settings.RECORD_ID_FORMAT
+        self.fields = settings.DISPLAYED_DATA_FIELDS
 
     def get_instance_name(self):
         return self.instance

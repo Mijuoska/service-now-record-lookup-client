@@ -4,3 +4,4 @@ Data
 *.db
 venv
 .vscode
+secret.key
