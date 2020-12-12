@@ -19,5 +19,41 @@ def create_folder(parent, child):
         os.mkdir(child_path)
         print(f'Created folder {child} in {parent}')
     else:
-        print(f'Folder named {child} already exists in {parent}')
+        print(f'Folder named {child} already exists in the folder {parent}')
     os.chdir(child_path)
+
+
+def file_exists(filename):
+    current_dir = os.getcwd()
+    file_path = os.path.join(current_dir, filename)
+    if os.path.exists(file_path):
+        return True
+    else:
+        return False
+
+def save_file(f):
+    filename = f['filename']
+    content = f['content']
+    if file_exists(filename):
+        choice = input(
+            f'File with the name {filename} already exists in the current directory. (c)opy or (o)verwrite (default): ')
+        if choice.lower() == 'c':
+            print('Creating a copy')
+            name = filename.split('.')[0]
+            extension = filename.split('.')[1]
+            filename = f'{name} - copy.{extension}'
+        elif choice.lower() == 'o':
+            print('Overwriting file')
+            filename = filename
+        else:
+            print('Invalid choice, defaulting to overwrite')
+            pass
+    print(f'saving file {filename}')
+    saved_file = open(filename, 'w+b')
+    saved_file.write(content)
+    saved_file.close()
+    print('Completed')
+
+    
+    
+        
