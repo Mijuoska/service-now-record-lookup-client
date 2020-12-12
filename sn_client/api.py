@@ -1,13 +1,15 @@
 import requests
 import json
 import re
+from .settings import RECORD_ID_FORMAT, DISPLAYED_DATA_FIELDS
 
 class SNClient:
     def __init__(self, instance, username, password):
         self.instance = instance
         self.username = username
         self.password = password
-        self.record_id_format = r"\D{3}\d+"
+        self.record_id_format = RECORD_ID_FORMAT
+        self.fields = DISPLAYED_DATA_FIELDS
 
     def get_instance_name(self):
         return self.instance
@@ -50,6 +52,10 @@ class SNClient:
         else:
             return None
             
+    def display_record_data(self, record):
+        for field in self.fields:
+            print(f'{field}: {record[field]}')
+
 
     def send_attachment_api_request(self, query):
         if query:

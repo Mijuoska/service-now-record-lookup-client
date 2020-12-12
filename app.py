@@ -46,7 +46,6 @@ else:
     sn_client.test_connection()
 
 
-
 while True:
     record_ID = input('Please enter a record ID: ')
     record_ID = sn_client.extract_record_id(record_ID)
@@ -55,20 +54,24 @@ while True:
         result = sn_client.send_table_api_request('task', f'number={record_ID}')
         if result is not None:
             print(
-                f'Found record with the ID {record_ID} in {sn_client.get_instance_url()}')
-            create_folder(sn_client.get_instance_name(), record_ID)
+                f'Found record {record_ID} in {sn_client.get_instance_url()} with the following values')
+            sn_client.display_record_data(result[0])
             ticket_sys_id = result[0]['sys_id']
             attachments = sn_client.send_attachment_api_request(
                 f'table_sys_id={ticket_sys_id}')
             if len(attachments) > 0:
-                print(f'found {len(attachments)} attachments')
-                for attachment in attachments:
-                    print('downloading...')
-                    f = sn_client.download_attachment(attachment['sys_id'])
-                    save_file(f)
-                
-            else:
-                print('No attachments found')
+                print(f'the record {record_ID} has {len(attachments)} attachments')
+                download_attachments = input('Download attachments (y: yes, no: any key) ? ')
+                if download_attachments.lower() == 'y':
+                    create_folder(sn_client.get_instance_name(), record_ID)
+                    for attachment in attachments:
+                        print('downloading...')
+                        f = sn_client.download_attachment(attachment['sys_id'])
+                        save_file(f)
+                else:
+                    pass
+                    
+            
         else:
             print(
                 f"No record found with the ID '{record_ID}' in {sn_client.get_instance_url()}")
