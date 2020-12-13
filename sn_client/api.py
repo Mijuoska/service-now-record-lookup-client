@@ -24,7 +24,7 @@ class SNClient:
         if response.ok:
             print(f'Connected to instance {url}')
         else:
-            print(f'Could not connect to instance {url}')
+            print(f'Could not connect to instance {url}. Status code {response.status_code}')
             exit()
 
 
