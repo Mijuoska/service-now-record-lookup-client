@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-from . import settings 
+import settings 
 
 class SNClient:
     def __init__(self, instance, username, password):

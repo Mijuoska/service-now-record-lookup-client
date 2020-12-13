@@ -1,5 +1,6 @@
 
 import os
+import re
 from settings import ROOT_PATH, PARENT_DIR_NAME
 
 def create_folder(parent, child):
@@ -39,9 +40,13 @@ def save_file(f):
             f'File with the name {filename} already exists in the current directory. (c)opy or (o)verwrite (default): ')
         if choice.lower() == 'c':
             print('Creating a copy')
-            name = filename.split('.')[0]
-            extension = filename.split('.')[1]
-            filename = f'{name} - copy.{extension}'
+            has_extension = re.search(r"\.\w+", filename)
+            if has_extension is not None:
+                name = filename.split('.')[0]
+                extension = filename.split('.')[1]
+                filename = f'{name} - copy.{extension}'
+            else:
+                filename = f'{filename} - copy'
         elif choice.lower() == 'o':
             print('Overwriting file')
             filename = filename
