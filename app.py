@@ -66,27 +66,29 @@ while True:
                     if options.lower() == 't':
                         sn_client.set_fields(
                             'number,short_description,description,caller_id')
-                        fields = sn_client.get_fields()
-                        fields_dict = sn_client.get_fields_dict(fields)
-                        missing_fields = []
-                        for field in fields:
-                            if record.get(field) is not None:
-                                fields_dict[field] = record.get(field)
-                            else:
-                                missing_fields.append(field)
+                        fields_dict = sn_client.get_fields_dict()
+                        missing_fields = sn_client.get_missing_fields_in_base_table(record)
                         # For fields which are present on the inherited table but not in the base Task table, we need to do a new query to retrieve those fields
                         if len(missing_fields) > 0:
-                            new_record = sn_client.get_record(
+                            record = sn_client.get_record(
                                 record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
-                            for missing_field in missing_fields:
-                                fields_dict[missing_field] = new_record.get(
-                                    missing_field)
+                            fields_dict = sn_client.populate_fields_dictionary(fields_dict, record)
+                        else:
+                            fields_dict = sn_client.populate_fields_dictionary(
+                                fields_dict, record)
+
                         create_folder(sn_client.get_instance_name(), record_ID)
                         file_template = generate_jira_template(fields_dict)
                         save_file(file_template)
 
                     else:    
                         sn_client.set_fields(None, True)
+                        missing_fields = sn_client.get_missing_fields_in_base_table(
+                            record)
+                        # For fields which are present on the inherited table but not in the base Task table, we need to do a new query to retrieve those fields
+                        if len(missing_fields) > 0:
+                            record = sn_client.get_record(
+                                record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
                         sn_client.display_record_data(record)
                         attachments = sn_client.send_attachment_api_request(
                             f'table_sys_id={record["sys_id"]}')

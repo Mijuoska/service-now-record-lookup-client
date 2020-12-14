@@ -40,6 +40,25 @@ class SNClient:
     def get_fields(self):
         return self.fields
 
+    def get_fields_dict(self):
+        return {}.fromkeys(self.fields)
+
+    # fields = fields to look for in base table
+    # record = base table record to check against
+    def get_missing_fields_in_base_table(self, record):
+        missing_fields = []
+        for field in self.fields:
+            if record.get(field) is None:
+                missing_fields.append(field)
+        return missing_fields
+                      
+    def populate_fields_dictionary(self, dict, record):
+        for field in self.fields:
+            dict[field] = record.get(field)
+        return dict
+
+
+
     def is_valid_record_id(self, text):
         match = re.search(self.record_id_format, text)
         return match is not None
@@ -77,8 +96,7 @@ class SNClient:
         for field in self.fields:
             print(f'{field}: {record[field]}')
 
-    def get_fields_dict(self, fields):
-        return {}.fromkeys(fields)
+
 
     def send_attachment_api_request(self, query):
         if query:
