@@ -72,6 +72,7 @@ while True:
                     new_record = sn_client.get_record(record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
                     for missing_field in missing_fields:
                         fields_dict[missing_field] = new_record.get(missing_field)
+                create_folder(sn_client.get_instance_name(), record_ID)
                 result_file = {}
                 content = f"Summary: {fields_dict['short_description']}\n\n"
                 content += f"Reporter: {fields_dict['caller_id']['display_value']}\n\n"
