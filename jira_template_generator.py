@@ -57,7 +57,7 @@ while True:
             result = sn_client.send_table_api_request('task', f'number={record_ID}')
             if result is not None:
                 print(
-                    f'Found record {record_ID} in {sn_client.get_instance_url()} with the following values')
+                    f'Found record {record_ID} in {sn_client.get_instance_url()}')
                 record = result[0]
                 sn_client.set_fields('number,short_description,description,caller_id')
                 fields = sn_client.get_fields()
@@ -68,19 +68,21 @@ while True:
                         fields_dict[field] = record.get(field)
                     else:
                         missing_fields.append(field)
+                # For fields which are present on the inherited table but not in the base Task table, we need to do a new query to retrieve those fields
                 if len(missing_fields) > 0:
                     new_record = sn_client.get_record(record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
                     for missing_field in missing_fields:
                         fields_dict[missing_field] = new_record.get(missing_field)
                 create_folder(sn_client.get_instance_name(), record_ID)
                 result_file = {}
-                content = f"Summary: {fields_dict['short_description']}\n\n"
-                content += f"Reporter: {fields_dict['caller_id']['display_value']}\n\n"
-                content += f"Description: \n\n{fields_dict['number']}\n\n"
-                content += f"\"\{fields_dict['description']}\"\n\n"
-                content += f"Update sets:\n{fields_dict['number']} {fields_dict['short_description']}"
-                result_file['content'] = content
-                result_file['filename'] = f"{fields_dict['number']} jira draft.txt"
+                content = f'Summary: {fields_dict["short_description"]}\n\n'
+                content += f'Reporter: {fields_dict["caller_id"]["display_value"]}\n\n'
+                content += f'Description: \n\n{fields_dict["number"]}\n\n'
+                content += f'\"{fields_dict["description"].strip()}\"\n\n'
+                content += f'Incident:\nCause:\nFix:\n\n'
+                content += f'Update sets:\n{fields_dict["number"]} {fields_dict["short_description"]}'
+                result_file["content"] = content
+                result_file["filename"] = f'{fields_dict["number"]} jira draft.txt'
                 save_file(result_file)
             else:
                 print(f"No record found with the ID '{record_ID}' in {sn_client.get_instance_url()}")
