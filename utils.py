@@ -61,6 +61,18 @@ def save_file(f):
     saved_file.close()
     print('Completed')
 
+def generate_jira_template(fields_dictionary):
+    file_template = {}
+    content = f'Summary: {fields_dictionary["short_description"]}\n\n'
+    content += f'Reporter: {fields_dictionary["caller_id"]["display_value"]}\n\n'
+    content += f'Description: \n\n{fields_dictionary["number"]}\n\n'
+    content += f'\"{fields_dictionary["description"].strip()}\"\n\n'
+    content += f'Incident:\nCause:\nFix:\n\n'
+    content += f'Update sets:\n{fields_dictionary["number"]} {fields_dictionary["short_description"]}'
+    file_template["content"] = content
+    file_template["filename"] = f'{fields_dictionary["number"]} jira draft.txt'
+    return file_template
+
+
+
     
-    
-        

@@ -1,6 +1,7 @@
 from sn_client.api import SNClient
 from sn_client.credential_manager import CredentialManager
-from utils import create_folder, save_file
+from utils import create_folder, save_file, generate_jira_template
+from settings import TEMPLATE_GENERATOR_ENABLED
 
 while True:
     cred_manager = CredentialManager()
@@ -57,24 +58,50 @@ while True:
             folder_name = record_ID
             result = sn_client.send_table_api_request('task', f'number={record_ID}')
             if result is not None:
+                record = result[0]
                 print(
-                    f'Found record {record_ID} in {sn_client.get_instance_url()} with the following values')
-                sn_client.display_record_data(result[0])
-                ticket_sys_id = result[0]['sys_id']
-                attachments = sn_client.send_attachment_api_request(
-                    f'table_sys_id={ticket_sys_id}')
-                if len(attachments) > 0:
-                    print(f'the record {record_ID} has {len(attachments)} attachments')
-                    download_attachments = input('Download attachments (y: yes, no: any key) ? ')
-                    if download_attachments.lower() == 'y':
+                    f'Found record {record["number"]} in {sn_client.get_instance_url()} with the following values')
+                if TEMPLATE_GENERATOR_ENABLED:
+                    options = input('(r)etrieve record information (default) or generate a (t)ext template? ')
+                    if options.lower() == 't':
+                        sn_client.set_fields(
+                            'number,short_description,description,caller_id')
+                        fields = sn_client.get_fields()
+                        fields_dict = sn_client.get_fields_dict(fields)
+                        missing_fields = []
+                        for field in fields:
+                            if record.get(field) is not None:
+                                fields_dict[field] = record.get(field)
+                            else:
+                                missing_fields.append(field)
+                        # For fields which are present on the inherited table but not in the base Task table, we need to do a new query to retrieve those fields
+                        if len(missing_fields) > 0:
+                            new_record = sn_client.get_record(
+                                record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
+                            for missing_field in missing_fields:
+                                fields_dict[missing_field] = new_record.get(
+                                    missing_field)
                         create_folder(sn_client.get_instance_name(), record_ID)
-                        for attachment in attachments:
-                            print('downloading...')
-                            f = sn_client.download_attachment(attachment['sys_id'])
-                            save_file(f)
-                    else:
-                        pass        
-                
+                        file_template = generate_jira_template(fields_dict)
+                        save_file(file_template)
+
+                    else:    
+                        sn_client.set_fields(None, True)
+                        sn_client.display_record_data(record)
+                        attachments = sn_client.send_attachment_api_request(
+                            f'table_sys_id={record["sys_id"]}')
+                        if len(attachments) > 0:
+                            print(f'the record {record_ID} has {len(attachments)} attachments')
+                            download_attachments = input('Download attachments (y: yes, no: any key) ? ')
+                            if download_attachments.lower() == 'y':
+                                create_folder(sn_client.get_instance_name(), record_ID)
+                                for attachment in attachments:
+                                    print('downloading...')
+                                    f = sn_client.download_attachment(attachment['sys_id'])
+                                    save_file(f)
+                            else:
+                                pass        
+                        
             else:
                 print(f"No record found with the ID '{record_ID}' in {sn_client.get_instance_url()}")
 

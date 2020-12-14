@@ -29,8 +29,11 @@ class SNClient:
             print(f'Could not connect to instance {url}. Status code {response.status_code}')
             exit()
    
-   # Used for overriding the DISPLAYED_DATA_FIELDS property
-    def set_fields(self, fields):
+   # Used for overriding the DISPLAYED_DATA_FIELDS property. If use_default is set to True, will self.fields to default values in the settings
+    def set_fields(self, fields, use_default=False):
+       if use_default:
+           self.fields = settings.DISPLAYED_DATA_FIELDS
+           return
        fields_list = fields.split(',')
        self.fields = fields_list
     
