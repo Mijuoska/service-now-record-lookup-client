@@ -1,0 +1,13 @@
+Summary: Can't read email
+
+Reporter: Fred Luddy
+
+Description: 
+
+INC0000001
+
+"User can't access email on mail.company.com.
+		"
+
+Update sets:
+INC0000001 Can't read email

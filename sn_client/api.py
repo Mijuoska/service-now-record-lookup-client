@@ -8,6 +8,8 @@ class SNClient:
         self.instance = instance
         self.username = username
         self.password = password
+        self.headers = {"Content-Type": "application/json",
+                   "Accept": "application/json"}
         self.record_id_format = settings.RECORD_ID_FORMAT
         self.fields = settings.DISPLAYED_DATA_FIELDS
 
@@ -26,7 +28,14 @@ class SNClient:
         else:
             print(f'Could not connect to instance {url}. Status code {response.status_code}')
             exit()
-
+   
+   # Used for overriding the DISPLAYED_DATA_FIELDS property
+    def set_fields(self, fields):
+       fields_list = fields.split(',')
+       self.fields = fields_list
+    
+    def get_fields(self):
+        return self.fields
 
     def is_valid_record_id(self, text):
         match = re.search(self.record_id_format, text)
@@ -43,19 +52,30 @@ class SNClient:
         if query:
             query = f'?sysparm_query={query}'
         url = f'{self.get_instance_url()}/api/now/table/{table}{query}'
-        headers = {"Content-Type": "application/json",
-                   "Accept": "application/json"}
-        response = requests.get(url, auth=(self.username, self.password), headers=headers)
+        response = requests.get(url, auth=(self.username, self.password), headers=self.headers)
         result = self._handle_response(response)
         if len(result) > 0:
             return result
         else:
             return None
+
+    def get_record(self, table, sys_id,**kwargs):
+        params = '?'
+        for k, v in kwargs.items():
+            params += f'{k}={v}&' 
+        url = f'{self.get_instance_url()}/api/now/table/{table}/{sys_id}{params}'
+        response = requests.get(url, auth=(self.username, self.password), headers=self.headers)
+        result = self._handle_response(response)
+        return result
+        
+
             
     def display_record_data(self, record):
         for field in self.fields:
             print(f'{field}: {record[field]}')
 
+    def get_fields_dict(self, fields):
+        return {}.fromkeys(fields)
 
     def send_attachment_api_request(self, query):
         if query:
@@ -64,7 +84,7 @@ class SNClient:
         headers = {"Content-Type": "application/json",
                    "Accept": "application/json"}
         response = requests.get(url, auth=(
-            self.username, self.password), headers=headers)
+            self.username, self.password), headers=self.headers)
         result = self._handle_response(response)
         return result
         
@@ -73,7 +93,7 @@ class SNClient:
         headers = {"Content-Type": "application/json",
                    "Accept": "application/json"}
         response = requests.get(url, auth=(
-            self.username, self.password), headers=headers)
+            self.username, self.password), headers=self.headers)
         if response.status_code != 200:
             print('Status:', response.status_code, 'Headers:',
                 response.headers, 'Error Response:', response.content)

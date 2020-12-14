@@ -35,6 +35,8 @@ def file_exists(filename):
 def save_file(f):
     filename = f['filename']
     content = f['content']
+    if type(content) == str:
+        content = content.encode()
     if file_exists(filename):
         choice = input(
             f'File with the name {filename} already exists in the current directory. (c)opy or (o)verwrite (default): ')
