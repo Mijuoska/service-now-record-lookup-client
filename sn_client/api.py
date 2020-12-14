@@ -83,6 +83,7 @@ class SNClient:
             return None
 
     def get_record(self, table, sys_id,**kwargs):
+        table = table.lower()
         params = '?'
         for k, v in kwargs.items():
             params += f'{k}={v}&' 
@@ -107,8 +108,6 @@ class SNClient:
         if query:
             query = f'?sysparm_query={query}'
         url = f'{self.get_instance_url()}/api/now/attachment{query}'
-        headers = {"Content-Type": "application/json",
-                   "Accept": "application/json"}
         response = requests.get(url, auth=(
             self.username, self.password), headers=self.headers)
         result = self._handle_response(response)
@@ -116,8 +115,6 @@ class SNClient:
         
     def download_attachment(self, attachment_sys_id):
         url = f'{self.get_instance_url()}/api/now/attachment/{attachment_sys_id}/file'
-        headers = {"Content-Type": "application/json",
-                   "Accept": "application/json"}
         response = requests.get(url, auth=(
             self.username, self.password), headers=self.headers)
         if response.status_code != 200:
@@ -135,7 +132,8 @@ class SNClient:
             print('Status:', response.status_code, 'Headers:',
             response.headers, 'Error Response:', response.content)
             result = {'status': response.status_code, 'error': response.content}
-        result = response.json()['result']
+        json_body = response.json()
+        result = json_body['result'] if json_body.get('result') is not None else json_body
         return result
 
 
