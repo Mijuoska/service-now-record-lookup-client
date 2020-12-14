@@ -57,8 +57,6 @@ class SNClient:
             dict[field] = record.get(field)
         return dict
 
-
-
     def is_valid_record_id(self, text):
         match = re.search(self.record_id_format, text)
         return match is not None
@@ -70,10 +68,13 @@ class SNClient:
         else:
             return None
 
-    def send_table_api_request(self, table, query):
+    def send_table_api_request(self, table, query, **kwargs):
+        params = '&'
+        for k, v in kwargs.items():
+            params += f'{k}={v}&'
         if query:
             query = f'?sysparm_query={query}'
-        url = f'{self.get_instance_url()}/api/now/table/{table}{query}'
+        url = f'{self.get_instance_url()}/api/now/table/{table}{query}{params}'
         response = requests.get(url, auth=(self.username, self.password), headers=self.headers)
         result = self._handle_response(response)
         if len(result) > 0:
@@ -94,7 +95,11 @@ class SNClient:
             
     def display_record_data(self, record):
         for field in self.fields:
-            print(f'{field}: {record[field]}')
+            if type(record[field]) == dict and record[field].get('display_value'):
+                value = record[field]['display_value']
+            else:
+                value = record[field]
+            print(f'{field}: {value}')
 
 
 

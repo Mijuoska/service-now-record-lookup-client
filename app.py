@@ -56,7 +56,7 @@ while True:
         else:
             record_ID = sn_client.extract_record_id(record_ID)           
             folder_name = record_ID
-            result = sn_client.send_table_api_request('task', f'number={record_ID}')
+            result = sn_client.send_table_api_request('task', f'number={record_ID}', sysparm_display_value='true')
             if result is not None:
                 record = result[0]
                 print(
