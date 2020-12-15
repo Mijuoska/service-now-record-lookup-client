@@ -1,6 +1,6 @@
 from sn_client.api import SNClient
 from sn_client.credential_manager import CredentialManager
-from utils import create_folder, save_file, generate_jira_template
+from utils import create_folder, save_file, generate_jira_template, parse_instance_name
 from settings import TEMPLATE_GENERATOR_ENABLED
 
 while True:
@@ -20,6 +20,7 @@ while True:
         if choice == 'q':
             break
         else:
+            choice = parse_instance_name(choice) 
             new_choice = choice
     else:
         if choice >= 1 and choice < len(saved_instances) + 1:

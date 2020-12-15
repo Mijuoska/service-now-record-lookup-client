@@ -92,8 +92,6 @@ class SNClient:
         result = self._handle_response(response)
         return result
         
-
-            
     def display_record_data(self, record):
         for field in self.fields:
             if type(record[field]) == dict and record[field].get('display_value'):

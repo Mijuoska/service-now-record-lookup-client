@@ -3,6 +3,15 @@ import os
 import re
 from settings import ROOT_PATH, PARENT_DIR_NAME
 
+
+def parse_instance_name(string):
+    initial_match = re.search(r".service-now.com", string)
+    if initial_match is not None:
+        name_match = re.search(r"\w*(?=.service-now.com)", string)
+        return name_match[0]
+    else:
+        return string
+
 def create_folder(parent, child):
     root_path = os.path.join(ROOT_PATH, PARENT_DIR_NAME)
     if not os.path.exists(root_path):
