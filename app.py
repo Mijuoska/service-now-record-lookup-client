@@ -22,7 +22,7 @@ while True:
         else:
             new_choice = choice
     else:
-        if choice >= 1 and choice <= len(saved_instances) + 1:
+        if choice >= 1 and choice < len(saved_instances) + 1:
             existing_choice = choice
         else:
             print('Invalid choice')
