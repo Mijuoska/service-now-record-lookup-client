@@ -57,7 +57,7 @@ while True:
         else:
             record_ID = sn_client.extract_record_id(record_ID)           
             folder_name = record_ID
-            result = sn_client.send_table_api_request('task', f'number={record_ID}', sysparm_display_value='true')
+            result = sn_client.query_records('task', f'number={record_ID}', sysparm_display_value='true')
             if result is not None:
                 record = result[0]
                 print(
@@ -91,7 +91,7 @@ while True:
                             record = sn_client.get_record(
                                 record['sys_class_name'], record['sys_id'], sysparm_display_value='true')
                         sn_client.display_record_data(record)
-                        attachments = sn_client.send_attachment_api_request(
+                        attachments = sn_client.query_attachments(
                             f'table_sys_id={record["sys_id"]}')
                         if len(attachments) > 0:
                             print(f'the record {record_ID} has {len(attachments)} attachments')
@@ -100,7 +100,7 @@ while True:
                                 create_folder(sn_client.get_instance_name(), record_ID)
                                 for attachment in attachments:
                                     print('downloading...')
-                                    f = sn_client.download_attachment(attachment['sys_id'])
+                                    f = sn_client.get_attachment(attachment['sys_id'])
                                     save_file(f)
                             else:
                                 pass        

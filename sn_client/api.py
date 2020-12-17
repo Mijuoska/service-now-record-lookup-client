@@ -68,7 +68,7 @@ class SNClient:
         else:
             return None
 
-    def send_table_api_request(self, table, query, **kwargs):
+    def query_records(self, table, query, **kwargs):
         params = '&'
         for k, v in kwargs.items():
             params += f'{k}={v}&'
@@ -102,7 +102,7 @@ class SNClient:
 
 
 
-    def send_attachment_api_request(self, query):
+    def query_attachments(self, query):
         if query:
             query = f'?sysparm_query={query}'
         url = f'{self.get_instance_url()}/api/now/attachment{query}'
@@ -111,7 +111,7 @@ class SNClient:
         result = self._handle_response(response)
         return result
         
-    def download_attachment(self, attachment_sys_id):
+    def get_attachment(self, attachment_sys_id):
         url = f'{self.get_instance_url()}/api/now/attachment/{attachment_sys_id}/file'
         response = requests.get(url, auth=(
             self.username, self.password), headers=self.headers)
