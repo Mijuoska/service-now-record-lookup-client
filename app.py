@@ -61,7 +61,7 @@ while True:
             if result is not None:
                 record = result[0]
                 print(
-                    f'Found record {record["number"]} in {sn_client.get_instance_url()} with the following values')
+                    f'Found record {record["number"]} in {sn_client.get_instance_url()}')
                 if TEMPLATE_GENERATOR_ENABLED:
                     options = input('(r)etrieve record information (default) or generate a (t)ext template? ')
                     if options.lower() == 't':
