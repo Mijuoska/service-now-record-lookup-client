@@ -58,7 +58,9 @@ while True:
             record_ID = sn_client.extract_record_id(record_ID)           
             folder_name = record_ID
             result = sn_client.query_records('task', f'number={record_ID}', sysparm_display_value='true')
-            if result is not None:
+            if result.get('error') is not None:
+                print(result['error'])   
+            elif result.get('error') is None and result is not None:
                 record = result[0]
                 print(
                     f'Found record {record["number"]} in {sn_client.get_instance_url()}')
@@ -104,7 +106,7 @@ while True:
                                     save_file(f)
                             else:
                                 pass        
-                        
+
             else:
                 print(f"No record found with the ID '{record_ID}' in {sn_client.get_instance_url()}")
 

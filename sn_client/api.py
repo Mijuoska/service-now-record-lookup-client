@@ -100,8 +100,6 @@ class SNClient:
                 value = record[field]
             print(f'{field}: {value}')
 
-
-
     def query_attachments(self, query):
         if query:
             query = f'?sysparm_query={query}'
@@ -129,9 +127,12 @@ class SNClient:
         if response.status_code != 200:
             print('Status:', response.status_code, 'Headers:',
             response.headers, 'Error Response:', response.content)
-            result = {'status': response.status_code, 'error': response.content}
-        json_body = response.json()
-        result = json_body['result'] if json_body.get('result') is not None else json_body
+            return {'status': response.status_code, 'error': response.content}
+        elif response.status_code == 200 and response.headers['Content-Type'] != 'application/json':
+            return {'status': response.status_code, 'error': 'Something went wrong with connecting to the instance'}
+            exit()
+        else:
+            result = json_body['result'] if json_body.get('result') is not None else json_body
         return result
 
 
