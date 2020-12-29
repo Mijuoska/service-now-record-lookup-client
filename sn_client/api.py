@@ -132,6 +132,7 @@ class SNClient:
             return {'status': response.status_code, 'error': 'Something went wrong with connecting to the instance'}
             exit()
         else:
+            json_body = response.json()
             result = json_body['result'] if json_body.get('result') is not None else json_body
         return result
 
