@@ -82,13 +82,10 @@ class SNClient:
         else:
             return None
 
-    def get_record(self, table, sys_id,**kwargs):
+    def get_record(self, table, sys_id,**params):
         table = table.lower()
-        params = '?'
-        for k, v in kwargs.items():
-            params += f'{k}={v}&' 
-        url = f'{self.get_instance_url()}/api/now/table/{table}/{sys_id}{params}'
-        response = requests.get(url, auth=(self.username, self.password), headers=self.headers)
+        url = f'{self.get_instance_url()}/api/now/table/{table}/{sys_id}'
+        response = requests.get(url, auth=(self.username, self.password), headers=self.headers, params=params)
         result = self._handle_response(response)
         return result
         
@@ -124,13 +121,12 @@ class SNClient:
                         
 
     def _handle_response(self, response):
-        if response.status_code != 200:
+        if response.status_code > 400:
             print('Status:', response.status_code, 'Headers:',
             response.headers, 'Error Response:', response.content)
-            return {'status': response.status_code, 'error': response.content}
-        elif response.status_code == 200 and response.headers['Content-Type'] != 'application/json':
-            return {'status': response.status_code, 'error': 'Something went wrong with connecting to the instance'}
             exit()
+        elif response.status_code == 200 and not response.headers['Content-Type'].startswith('application/json'):
+            return {'status': response.status_code, 'error': 'Something went wrong with connecting to the instance'}
         else:
             json_body = response.json()
             result = json_body['result'] if json_body.get('result') is not None else json_body
