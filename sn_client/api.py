@@ -68,14 +68,11 @@ class SNClient:
         else:
             return None
 
-    def query_records(self, table, query, **kwargs):
-        params = '&'
-        for k, v in kwargs.items():
-            params += f'{k}={v}&'
+    def query_records(self, table, query, **params):
         if query:
             query = f'?sysparm_query={query}'
-        url = f'{self.get_instance_url()}/api/now/table/{table}{query}{params}'
-        response = requests.get(url, auth=(self.username, self.password), headers=self.headers)
+        url = f'{self.get_instance_url()}/api/now/table/{table}{query}'
+        response = requests.get(url, auth=(self.username, self.password), headers=self.headers, params=params)
         result = self._handle_response(response)
         if len(result) > 0:
             return result
